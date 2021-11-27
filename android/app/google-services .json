@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "54692371369",
+    "project_id": "algitsin-5ab25",
+    "storage_bucket": "algitsin-5ab25.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:54692371369:android:a3df06d92dad941f7d42b8",
+        "android_client_info": {
+          "package_name": "com.example.algitsin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "54692371369-frhl68irm620tpqjpvb04q2v4436ohd4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.algitsin",
+            "certificate_hash": "c5c10ab91f504b0eb1af19b88f83cd774308bd82"
+          }
+        },
+        {
+          "client_id": "54692371369-ek05qufqdjrtjp91boneg9a8a58glafg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8DcUCsCt79nGKpB0LvBqTytMu5yAbH4Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "54692371369-ek05qufqdjrtjp91boneg9a8a58glafg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
