@@ -1,4 +1,4 @@
-import 'package:algitsin/extensions/size_extention.dart';
+import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,15 +9,11 @@ final algitsinThemeData = ThemeData(
     cardColor: const Color(0xffF8B34B),
     focusColor: const Color(0xffDFE4E3),
     dividerColor: const Color(0xff9098B1),
-    dialogBackgroundColor: const Color(0xffFFFFFF),
+    dialogBackgroundColor: const Color(0xff55f7b9),
     hoverColor: const Color(0xff40BFFF),
-    canvasColor: const Color(0xff000000),
-    scaffoldBackgroundColor:const Color(0xff55f7b9),
-    appBarTheme: const AppBarTheme(
-      iconTheme: IconThemeData(
-        color: Colors.black,
-      ),
-    ),
+    canvasColor:const Color(0xffFFFFFF),
+    selectedRowColor: const Color(0xff000000),
+    scaffoldBackgroundColor: const Color(0xffFFFFFF),
     textTheme: TextTheme(
         headline5: GoogleFonts.poppins(
             fontSize: 14.0.spByWidth,
@@ -45,10 +41,11 @@ final algitsinThemeData = ThemeData(
             fontWeight: FontWeight.w400,
             color: const Color(0xff000000)),
         headline1: GoogleFonts.poppins(
-            fontSize: 18.0.spByWidth,
-            fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.w800,
-            color: const Color(0xff9098B1),),
+          fontSize: 18.0.spByWidth,
+          fontStyle: FontStyle.normal,
+          fontWeight: FontWeight.w800,
+          color: const Color(0xff9098B1),
+        ),
         caption: GoogleFonts.poppins(
             fontSize: 16.0.spByWidth,
             fontStyle: FontStyle.normal,
