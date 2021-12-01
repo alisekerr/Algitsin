@@ -17,7 +17,7 @@ class SellerLogin extends StatefulWidget {
 }
 
 var switchState = SwitchState(title: "Create seller account", value: false);
-bool denemee = false;
+
 
 class _SellerLoginState extends State<SellerLogin> {
   final emailController = TextEditingController();

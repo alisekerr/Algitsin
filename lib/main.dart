@@ -24,6 +24,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
      theme:algitsinThemeData,
       debugShowCheckedModeBanner: false,
-      home:  const SellerLogin());
+      home:  const ControlPage());
   }
 }
