@@ -1,3 +1,4 @@
+import 'package:algitsin/core/exception/product_not_found.dart';
 import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/service/firestore/firestore_service.dart';
 import 'package:algitsin/product/widgets/advertising_card.dart';
@@ -11,6 +12,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FirestoreService firestoreService = FirestoreService();
+
     return Scaffold(
       body: Scaffold(
         backgroundColor: Colors.white,
@@ -81,130 +83,147 @@ class HomePage extends StatelessWidget {
                         stream: firestoreService.getClothesProductData(),
                         builder: (BuildContext context,
                             AsyncSnapshot<QuerySnapshot> snapshot) {
-                          return !snapshot.hasData
-                              ? const CircularProgressIndicator()
-                              : ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: snapshot.data!.docs.length,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return GestureDetector(
-                                      onTap: () {},
-                                      child: Container(
-                                        width: 180.0.w,
-                                        height: 180.0.h,
-                                        margin: EdgeInsets.only(
-                                            right: 20.0.w, bottom: 25.0.w),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          color: Colors.white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              offset: const Offset(5, 10),
-                                              blurRadius: 15,
-                                              color: Colors.grey.shade200,
-                                            )
-                                          ],
-                                        ),
-                                        padding: EdgeInsets.all(10.0.h),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(
-                                              height: 100.0.h,
-                                              width: 200.0.w,
-                                              child: Stack(
-                                                children: [
-                                                  SizedBox(
-                                                    width: double.infinity,
-                                                    child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                    15.0.h),
-                                                        child: Image.network(
-                                                            snapshot.data!
-                                                                    .docs[index]
-                                                                [
-                                                                "productimage"],
-                                                            fit: BoxFit.cover)),
-                                                  ),
-                                                  // Add to cart button
-                                                  Positioned(
-                                                    right: 5,
-                                                    bottom: 5,
-                                                    child: MaterialButton(
-                                                      color: Colors.black,
-                                                      minWidth: 45,
-                                                      height: 45,
-                                                      shape: RoundedRectangleBorder(
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.none:
+                              throw ProductNotFound(value: snapshot.data!.docs.toString());
+                            case ConnectionState.waiting:
+                              return const Center(
+                                  child: Text("Ürün Yükleniyor..."));
+                            default:
+                              if (snapshot.hasData) {
+                                if (snapshot.data!.docs.isEmpty) {
+                                  return const Center(
+                                      child: Text("Ürün Bulunamadı..."));
+                                } else {
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.data!.docs.length,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return GestureDetector(
+                                        onTap: () {},
+                                        child: Container(
+                                          width: 180.0.w,
+                                          height: 180.0.h,
+                                          margin: EdgeInsets.only(
+                                              right: 20.0.w, bottom: 25.0.w),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            color: Colors.white,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                offset: const Offset(5, 10),
+                                                blurRadius: 15,
+                                                color: Colors.grey.shade200,
+                                              )
+                                            ],
+                                          ),
+                                          padding: EdgeInsets.all(10.0.h),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                height: 100.0.h,
+                                                width: 200.0.w,
+                                                child: Stack(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: double.infinity,
+                                                      child: ClipRRect(
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(
-                                                                      50.0.h)),
-                                                      onPressed: () {},
-                                                      padding:
-                                                          EdgeInsets.all(5.0.h),
-                                                      child: Center(
-                                                          child: Icon(
-                                                        Icons.shopping_cart,
-                                                        color: Colors.white,
-                                                        size: 19.0.h,
-                                                      )),
+                                                                      15.0.h),
+                                                          child: Image.network(
+                                                              snapshot.data!
+                                                                          .docs[
+                                                                      index][
+                                                                  "productimage"],
+                                                              fit: BoxFit
+                                                                  .cover)),
                                                     ),
-                                                  )
+                                                    // Add to cart button
+                                                    Positioned(
+                                                      right: 5,
+                                                      bottom: 5,
+                                                      child: MaterialButton(
+                                                        color: Colors.black,
+                                                        minWidth: 45,
+                                                        height: 45,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50.0.h)),
+                                                        onPressed: () {},
+                                                        padding: EdgeInsets.all(
+                                                            5.0.h),
+                                                        child: Center(
+                                                            child: Icon(
+                                                          Icons.shopping_cart,
+                                                          color: Colors.white,
+                                                          size: 19.0.h,
+                                                        )),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 10.0.h,
+                                              ),
+                                              Text(
+                                                snapshot.data!.docs[index]
+                                                    ["productname"],
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 12.0.spByWidth,
+                                                ),
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    snapshot.data!.docs[index]
+                                                        ["productbrand"],
+                                                    style: TextStyle(
+                                                      color: Colors
+                                                          .orange.shade400,
+                                                      fontSize: 14.0.spByWidth,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    " \$" +
+                                                        snapshot
+                                                            .data!
+                                                            .docs[index]
+                                                                ["productprice"]
+                                                            .toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize:
+                                                            16.0.spByWidth,
+                                                        fontWeight:
+                                                            FontWeight.w800),
+                                                  ),
                                                 ],
                                               ),
-                                            ),
-                                            SizedBox(
-                                              height: 10.0.h,
-                                            ),
-                                            Text(
-                                              snapshot.data!.docs[index]
-                                                  ["productname"],
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12.0.spByWidth,
-                                              ),
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  snapshot.data!.docs[index]
-                                                      ["productbrand"],
-                                                  style: TextStyle(
-                                                    color:
-                                                        Colors.orange.shade400,
-                                                    fontSize: 14.0.spByWidth,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  " \$" +
-                                                      snapshot
-                                                          .data!
-                                                          .docs[index]
-                                                              ["productprice"]
-                                                          .toString(),
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 16.0.spByWidth,
-                                                      fontWeight:
-                                                          FontWeight.w800),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                );
+                                      );
+                                    },
+                                  );
+                                }
+                              } else {
+                                return Center(child: Text("Hata..."));
+                              }
+                          }
                         })),
               ),
               Padding(
@@ -215,113 +234,145 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               StreamBuilder(
-                        stream: firestoreService.getHomeStuffProductData(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<QuerySnapshot> snapshot) {
-                          return !snapshot.hasData
-                              ? const CircularProgressIndicator()
-                              : StaggeredGridView.countBuilder(
-                staggeredTileBuilder: (index) =>
-                    const StaggeredTile.count(1, 1.3),
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      width: 180.0.w,
-                      height: 200.0.h,
-                      margin: EdgeInsets.only(right: 20.0.w, bottom: 25.0.w),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            offset: const Offset(5, 10),
-                            blurRadius: 15,
-                            color: Colors.grey.shade200,
-                          )
-                        ],
-                      ),
-                      padding: EdgeInsets.all(10.0.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 100.0.h,
-                            width: 200.0.w,
-                            child: Stack(
-                              children: [
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(15.0.h),
-                                      child: Image.network(snapshot.data!.docs[index]["productimage"],fit: BoxFit.cover,)),
-                                ),
-                                // Add to cart button
-                                Positioned(
-                                  right: 5,
-                                  bottom: 5,
-                                  child: MaterialButton(
-                                    color: Colors.black,
-                                    minWidth: 45,
-                                    height: 45,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(50.0.h)),
-                                    onPressed: () {},
-                                    padding: EdgeInsets.all(5.0.h),
-                                    child: Center(
-                                        child: Icon(
-                                      Icons.shopping_cart,
+                  stream: firestoreService.getHomeStuffProductData(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                        throw ProductNotFound(value: snapshot.data!.docs.toString());
+                      case ConnectionState.waiting:
+                        return const Center(
+                                  child: Text("Ürün Yükleniyor..."));
+                      default:
+                        if (snapshot.hasData) {
+                          if (snapshot.data!.docs.isEmpty) {
+                            return const Center(
+                                child: Text("Ürün Bulunamadı..."));
+                          } else {
+                            return StaggeredGridView.countBuilder(
+                              staggeredTileBuilder: (index) =>
+                                  const StaggeredTile.count(1, 1.3),
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    width: 180.0.w,
+                                    height: 200.0.h,
+                                    margin: EdgeInsets.only(
+                                        right: 20.0.w, bottom: 25.0.w),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
                                       color: Colors.white,
-                                      size: 19.0.h,
-                                    )),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          offset: const Offset(5, 10),
+                                          blurRadius: 15,
+                                          color: Colors.grey.shade200,
+                                        )
+                                      ],
+                                    ),
+                                    padding: EdgeInsets.all(10.0.h),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          height: 100.0.h,
+                                          width: 200.0.w,
+                                          child: Stack(
+                                            children: [
+                                              SizedBox(
+                                                width: double.infinity,
+                                                child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.0.h),
+                                                    child: Image.network(
+                                                      snapshot.data!.docs[index]
+                                                          ["productimage"],
+                                                      fit: BoxFit.cover,
+                                                    )),
+                                              ),
+                                              // Add to cart button
+                                              Positioned(
+                                                right: 5,
+                                                bottom: 5,
+                                                child: MaterialButton(
+                                                  color: Colors.black,
+                                                  minWidth: 45,
+                                                  height: 45,
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              50.0.h)),
+                                                  onPressed: () {},
+                                                  padding:
+                                                      EdgeInsets.all(5.0.h),
+                                                  child: Center(
+                                                      child: Icon(
+                                                    Icons.shopping_cart,
+                                                    color: Colors.white,
+                                                    size: 19.0.h,
+                                                  )),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10.0.h,
+                                        ),
+                                        Text(
+                                          snapshot.data!.docs[index]
+                                              ["productname"],
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 12.0.spByWidth,
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              snapshot.data!.docs[index]
+                                                  ["productbrand"],
+                                              style: TextStyle(
+                                                color: Colors.orange.shade400,
+                                                fontSize: 14.0.spByWidth,
+                                              ),
+                                            ),
+                                            Text(
+                                              " \$" +
+                                                  snapshot
+                                                      .data!
+                                                      .docs[index]
+                                                          ["productprice"]
+                                                      .toString(),
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16.0.spByWidth,
+                                                  fontWeight: FontWeight.w800),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 10.0.h,
-                          ),
-                          Text(
-                            snapshot.data!.docs[index]["productname"],
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12.0.spByWidth,
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                snapshot.data!.docs[index]["productbrand"],
-                                style: TextStyle(
-                                  color: Colors.orange.shade400,
-                                  fontSize: 14.0.spByWidth,
-                                ),
-                              ),
-                              Text(
-                                " \$"+snapshot.data!.docs[index]["productprice"].toString(),
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16.0.spByWidth,
-                                    fontWeight: FontWeight.w800),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-                        })
+                                );
+                              },
+                            );
+                          }
+                        } else {
+                          return const Center(child: Text("Hata..."));
+                        }
+                    }
+                  })
             ],
           ),
         ),
@@ -329,105 +380,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-/*StaggeredGridView.countBuilder(
-                staggeredTileBuilder: (index) =>
-                    const StaggeredTile.count(1, 1.3),
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                itemCount: 10,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      width: 180.0.w,
-                      height: 200.0.h,
-                      margin: EdgeInsets.only(right: 20.0.w, bottom: 25.0.w),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            offset: const Offset(5, 10),
-                            blurRadius: 15,
-                            color: Colors.grey.shade200,
-                          )
-                        ],
-                      ),
-                      padding: EdgeInsets.all(10.0.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 100.0.h,
-                            width: 200.0.w,
-                            child: Stack(
-                              children: [
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(15.0.h),
-                                      child: Image.asset("assets/ayakkabi.png",
-                                          fit: BoxFit.cover)),
-                                ),
-                                // Add to cart button
-                                Positioned(
-                                  right: 5,
-                                  bottom: 5,
-                                  child: MaterialButton(
-                                    color: Colors.black,
-                                    minWidth: 45,
-                                    height: 45,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(50.0.h)),
-                                    onPressed: () {},
-                                    padding: EdgeInsets.all(5.0.h),
-                                    child: Center(
-                                        child: Icon(
-                                      Icons.shopping_cart,
-                                      color: Colors.white,
-                                      size: 19.0.h,
-                                    )),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 10.0.h,
-                          ),
-                          Text(
-                            "Nike 2021 Defy All Day",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12.0.spByWidth,
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Nike",
-                                style: TextStyle(
-                                  color: Colors.orange.shade400,
-                                  fontSize: 14.0.spByWidth,
-                                ),
-                              ),
-                              Text(
-                                " \$50",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16.0.spByWidth,
-                                    fontWeight: FontWeight.w800),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ), */
