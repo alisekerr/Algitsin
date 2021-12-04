@@ -6,4 +6,5 @@ abstract class IAuthService {
   signOut();
   Future<User?> creatPerson(String name, String email,String password);
   
+  
 }

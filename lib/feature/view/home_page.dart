@@ -1,11 +1,14 @@
 import 'package:algitsin/core/exception/product_not_found.dart';
 import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/service/firestore/firestore_service.dart';
+import 'package:algitsin/feature/view/login_page.dart';
 import 'package:algitsin/feature/view/product_detail_page.dart';
 import 'package:algitsin/product/widgets/advertising_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -109,7 +112,10 @@ class HomePage extends StatelessWidget {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                       ProductDetailPage(selectedDoc: snapshot.data!.docs[index],)));
+                                                      ProductDetailPage(
+                                                        selectedDoc: snapshot
+                                                            .data!.docs[index],
+                                                      )));
                                         },
                                         child: Container(
                                           width: 180.0.w,
@@ -187,7 +193,8 @@ class HomePage extends StatelessWidget {
                                                 snapshot.data!.docs[index]
                                                     ["productname"],
                                                 style: TextStyle(
-                                                  color: Theme.of(context).selectedRowColor,
+                                                  color: Theme.of(context)
+                                                      .selectedRowColor,
                                                   fontSize: 12.0.spByWidth,
                                                 ),
                                               ),
@@ -200,7 +207,8 @@ class HomePage extends StatelessWidget {
                                                     snapshot.data!.docs[index]
                                                         ["productbrand"],
                                                     style: TextStyle(
-                                                      color: Theme.of(context).primaryColor,
+                                                      color: Theme.of(context)
+                                                          .primaryColor,
                                                       fontSize: 14.0.spByWidth,
                                                     ),
                                                   ),
