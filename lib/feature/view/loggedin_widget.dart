@@ -45,7 +45,7 @@ class _LoggedinWidgetState extends State<LoggedinWidget> {
     });
 
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('A new onMessageOpenedApp event was published!');
+     
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
@@ -118,7 +118,6 @@ class _LoggedinWidgetState extends State<LoggedinWidget> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: showNotification,
-        tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
     );
