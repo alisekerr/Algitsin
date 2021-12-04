@@ -3,6 +3,7 @@ import 'package:algitsin/feature/view/basket_page.dart';
 import 'package:algitsin/feature/view/category_page.dart';
 import 'package:algitsin/feature/view/home_page.dart';
 import 'package:algitsin/feature/view/search_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ControlPage extends StatefulWidget {
@@ -57,30 +58,31 @@ class _ControlPageState extends State<ControlPage> {
 
   BottomNavigationBar buildBottomNavBar(BuildContext context) {
     return BottomNavigationBar(
-        currentIndex: _selectedPage,
-        onTap: (index) {
-          _onItemTapped(index);
-        },
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor:Theme.of(context).dividerColor ,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag_outlined),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle_outlined),
-            label: 'Profile',
-          ),
-        ],
-      );
+      currentIndex: _selectedPage,
+      onTap: (index) {
+        _onItemTapped(index);
+      },
+      selectedItemColor: Theme.of(context).primaryColor,
+      unselectedItemColor: Theme.of(context).dividerColor,
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_outlined),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.search),
+          label: 'Search',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.shopping_bag_outlined),
+          label: 'Cart',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.account_circle_outlined),
+          label: 'Profile',
+        ),
+      ],
+    );
   }
+
 }

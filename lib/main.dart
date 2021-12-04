@@ -3,6 +3,7 @@ import 'package:algitsin/constants/theme_data.dart';
 import 'package:algitsin/core/extensions/size_config.dart';
 import 'package:algitsin/feature/view/control_page.dart';
 import 'package:algitsin/feature/view/login_page.dart';
+import 'package:algitsin/feature/view/product_detail_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +25,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
      theme:algitsinThemeData,
       debugShowCheckedModeBanner: false,
-      home:  const ControlPage());
+      home:   const ControlPage());
   }
 }

@@ -28,12 +28,12 @@ final algitsinThemeData = ThemeData(
         headline4: GoogleFonts.poppins(
             fontSize: 16.0.spByWidth,
             fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w600,
             color: const Color(0xff000000)),
         headline3: GoogleFonts.poppins(
             fontSize: 14.0.spByWidth,
             fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.normal,
             color: const Color(0xff000000)),
         headline2: GoogleFonts.poppins(
             fontSize: 17.0.spByWidth,

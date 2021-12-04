@@ -1,6 +1,7 @@
 import 'package:algitsin/core/exception/product_not_found.dart';
 import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/service/firestore/firestore_service.dart';
+import 'package:algitsin/feature/view/product_detail_page.dart';
 import 'package:algitsin/product/widgets/advertising_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -85,7 +86,8 @@ class HomePage extends StatelessWidget {
                             AsyncSnapshot<QuerySnapshot> snapshot) {
                           switch (snapshot.connectionState) {
                             case ConnectionState.none:
-                              throw ProductNotFound(value: snapshot.data!.docs.toString());
+                              throw ProductNotFound(
+                                  value: snapshot.data!.docs.toString());
                             case ConnectionState.waiting:
                               return const Center(
                                   child: Text("Ürün Yükleniyor..."));
@@ -102,7 +104,13 @@ class HomePage extends StatelessWidget {
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       return GestureDetector(
-                                        onTap: () {},
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                       ProductDetailPage(selectedDoc: snapshot.data!.docs[index],)));
+                                        },
                                         child: Container(
                                           width: 180.0.w,
                                           height: 180.0.h,
@@ -179,7 +187,7 @@ class HomePage extends StatelessWidget {
                                                 snapshot.data!.docs[index]
                                                     ["productname"],
                                                 style: TextStyle(
-                                                  color: Colors.black,
+                                                  color: Theme.of(context).selectedRowColor,
                                                   fontSize: 12.0.spByWidth,
                                                 ),
                                               ),
@@ -192,8 +200,7 @@ class HomePage extends StatelessWidget {
                                                     snapshot.data!.docs[index]
                                                         ["productbrand"],
                                                     style: TextStyle(
-                                                      color: Colors
-                                                          .orange.shade400,
+                                                      color: Theme.of(context).primaryColor,
                                                       fontSize: 14.0.spByWidth,
                                                     ),
                                                   ),
@@ -239,10 +246,10 @@ class HomePage extends StatelessWidget {
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.none:
-                        throw ProductNotFound(value: snapshot.data!.docs.toString());
+                        throw ProductNotFound(
+                            value: snapshot.data!.docs.toString());
                       case ConnectionState.waiting:
-                        return const Center(
-                                  child: Text("Ürün Yükleniyor..."));
+                        return const Center(child: Text("Ürün Yükleniyor..."));
                       default:
                         if (snapshot.hasData) {
                           if (snapshot.data!.docs.isEmpty) {
