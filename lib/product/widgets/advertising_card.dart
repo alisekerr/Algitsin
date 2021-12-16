@@ -29,6 +29,7 @@ class AdvertisingCard extends StatelessWidget {
                       return const Center(child: Text("Ürün Bulunamadı..."));
                     } else {
                       return ListView.builder(
+                         physics: const BouncingScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: snapshot.data!.docs.length,
                         scrollDirection: Axis.horizontal,

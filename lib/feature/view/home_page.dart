@@ -17,8 +17,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     FirestoreService firestoreService = FirestoreService();
 
-    return Scaffold(
-      body: Scaffold(
+    return  Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -84,6 +83,7 @@ class HomePage extends StatelessWidget {
                 child: SizedBox(
                     height: 200.0.h,
                     child: StreamBuilder(
+                      
                         stream: firestoreService.getClothesProductData(),
                         builder: (BuildContext context,
                             AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -101,6 +101,7 @@ class HomePage extends StatelessWidget {
                                       child: Text("Ürün Bulunamadı..."));
                                 } else {
                                   return ListView.builder(
+                                    physics: const BouncingScrollPhysics(),
                                     shrinkWrap: true,
                                     itemCount: snapshot.data!.docs.length,
                                     scrollDirection: Axis.horizontal,
@@ -391,7 +392,7 @@ class HomePage extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
+    
   }
 }

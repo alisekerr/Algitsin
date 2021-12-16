@@ -11,6 +11,7 @@ class AuthService extends IAuthService {
   Future<User?> signIn(String email, String password) async {
     var user =
         await auth.signInWithEmailAndPassword(email: email, password: password);
+
     return user.user;
   }
 
@@ -32,4 +33,22 @@ class AuthService extends IAuthService {
 
     return user.user;
   }
+  /*basketShop(
+    String name,
+    String brand,
+    String imageUrl,
+    int price,
+  ) async {
+    await firestore
+        .collection("Person")
+        .doc(user.user!.uid)
+        .collection("Product")
+        .doc(name)
+        .set({
+      "productname": name,
+      "productbrand": brand,
+      "productprice": price,
+      "productimage": imageUrl,
+    });
+  }*/
 }

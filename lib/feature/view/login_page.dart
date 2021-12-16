@@ -1,10 +1,12 @@
 import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/service/auth/auth_service.dart';
 import 'package:algitsin/feature/service/auth/google_signin_provider.dart';
+import 'package:algitsin/feature/view/control_page.dart';
 import 'package:algitsin/feature/view/home_page.dart';
 import 'package:algitsin/feature/view/loggedin_widget.dart';
 import 'package:algitsin/feature/view/register_bottom_sheet.dart';
 import 'package:algitsin/feature/viewmodel/switch_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,6 +25,10 @@ class _SellerLoginState extends State<SellerLogin> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  String userId = "";
+  var user = FirebaseAuth.instance.currentUser;
+  GoogleSigninProvider googleSignin = GoogleSigninProvider();
+
   AuthService authService = AuthService();
   String userEmail = "";
   bool isVisibility = true;
@@ -36,12 +42,12 @@ class _SellerLoginState extends State<SellerLogin> {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).textTheme;
-
     return Scaffold(
       body: Align(
         alignment: Alignment.center,
         child: SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset("assets/welcome-icon.png"),
               Text(
@@ -64,13 +70,19 @@ class _SellerLoginState extends State<SellerLogin> {
                 height: 57.0.h,
                 child: ElevatedButton(
                   onPressed: () {
+                    userId = user!.uid;
+                    if (userId == "") {
+                      googleSignin.creatPerson(
+                          user!.displayName!, user!.email!);
+                    }
+
                     final provider = Provider.of<GoogleSigninProvider>(context,
                         listen: false);
                     provider.googleLogin().then((value) =>
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => LoggedinWidget())));
+                                builder: (context) => ControlPage())));
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -130,8 +142,10 @@ class _SellerLoginState extends State<SellerLogin> {
         onPressed: () async {
           await authService
               .signIn(emailController.text, passwordController.text)
-              .then((value) => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const HomePage())));
+              .then((value) => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ControlPage())));
         },
         child: Text(
           "Giriş Yap",

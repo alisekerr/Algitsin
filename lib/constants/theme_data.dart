@@ -1,5 +1,4 @@
 import 'package:algitsin/core/extensions/size_extention.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -16,7 +15,7 @@ final algitsinThemeData = ThemeData(
     scaffoldBackgroundColor: const Color(0xffFFFFFF),
     textTheme: TextTheme(
         headline5: GoogleFonts.poppins(
-            fontSize: 14.0.spByWidth,
+            fontSize: 16.0.spByWidth,
             fontStyle: FontStyle.normal,
             fontWeight: FontWeight.w500,
             color: const Color(0xffFFFFFF)),
@@ -67,10 +66,10 @@ final algitsinThemeData = ThemeData(
             fontWeight: FontWeight.w400,
             color: const Color(0xff000000).withOpacity(0.75)),
         overline: GoogleFonts.poppins(
-            fontSize: 12.0.spByWidth,
+            fontSize: 20.0.spByWidth,
             fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.w400,
-            color: const Color(0xff9098B1)),
+            fontWeight: FontWeight.bold,
+            color: const Color(0xffFFFFFF)),
         button: GoogleFonts.poppins(
             fontSize: 14.0.spByWidth,
             fontStyle: FontStyle.normal,

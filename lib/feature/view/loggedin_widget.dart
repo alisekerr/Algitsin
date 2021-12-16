@@ -1,4 +1,4 @@
-import 'package:algitsin/core/extensions/size_extention.dart';
+/*import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/service/auth/google_signin_provider.dart';
 import 'package:algitsin/feature/view/login_page.dart';
 import 'package:algitsin/main.dart';
@@ -116,11 +116,8 @@ class _LoggedinWidgetState extends State<LoggedinWidget> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: showNotification,
-        child: const Icon(Icons.add),
-      ),
+    
     );
   }
 }
-
+*/

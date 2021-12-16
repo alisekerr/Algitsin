@@ -3,6 +3,7 @@ import 'package:algitsin/feature/view/basket_page.dart';
 import 'package:algitsin/feature/view/category_page.dart';
 import 'package:algitsin/feature/view/home_page.dart';
 import 'package:algitsin/feature/view/search_page.dart';
+import 'package:algitsin/feature/view/user_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +23,7 @@ class _ControlPageState extends State<ControlPage> {
     const HomePage(),
     const SearchPage(),
     const BasketPage(),
-    const CategoryPage()
+    const UserPage()
   ];
 
   void _onItemTapped(int index) {
@@ -67,19 +68,19 @@ class _ControlPageState extends State<ControlPage> {
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),
-          label: 'Home',
+          label: 'Anasayfa',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.search),
-          label: 'Search',
+          label: 'Arama',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.shopping_bag_outlined),
-          label: 'Cart',
+          label: 'Sepetim',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.account_circle_outlined),
-          label: 'Profile',
+          label: 'Hesabım',
         ),
       ],
     );
