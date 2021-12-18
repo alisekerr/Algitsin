@@ -2,10 +2,12 @@ import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/view/basket_page.dart';
 import 'package:algitsin/feature/view/category_page.dart';
 import 'package:algitsin/feature/view/home_page.dart';
+import 'package:algitsin/feature/view/loading_page.dart';
 import 'package:algitsin/feature/view/search_page.dart';
 import 'package:algitsin/feature/view/user_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ControlPage extends StatefulWidget {
   const ControlPage({Key? key}) : super(key: key);
@@ -33,6 +35,13 @@ class _ControlPageState extends State<ControlPage> {
     });
   }
 
+  bool _loadingVisible = false;
+  Future<void> _changeLoadingVisible() async {
+    setState(() {
+      _loadingVisible = !_loadingVisible;
+    });
+  }
+
   @override
   void initState() {
     _pageController = PageController(initialPage: 0);
@@ -40,15 +49,35 @@ class _ControlPageState extends State<ControlPage> {
     super.initState();
   }
 
+  Future delayMake() async {
+    await Future.delayed(const Duration(seconds: 3));
+    setState(() {
+      _loadingVisible = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        onPageChanged: (index) => setState(() {
-          _selectedPage = index;
-        }),
-        controller: _pageController,
-        children: [...pages],
+      body: LoadingPage(
+        inAsyncCall: _loadingVisible,
+        child: PageView(
+          onPageChanged: (index) async {
+            if (index !=0 && index !=1 && index!=3) {
+              SystemChannels.textInput.invokeMethod('TextInput.hide');
+            await _changeLoadingVisible();
+            }
+            
+            setState(() {
+              _selectedPage = index;
+            });
+          
+              delayMake();
+            
+          },
+          controller: _pageController,
+          children: [...pages],
+        ),
       ),
       bottomNavigationBar: SizedBox(
         height: 50.0.h,
@@ -85,5 +114,4 @@ class _ControlPageState extends State<ControlPage> {
       ],
     );
   }
-
 }

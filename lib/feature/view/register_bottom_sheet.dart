@@ -25,7 +25,7 @@ class RegisterBottomSheet extends StatelessWidget {
         TextSpan(text: "Bir heabın yok mu ? ", style: theme.subtitle2),
         TextSpan(
             text: "Kayıt ol",
-            style: theme.overline!.copyWith(color: const Color(0xff55f7b9)))
+            style: theme.subtitle2!.copyWith(color: const Color(0xff55f7b9),fontWeight: FontWeight.bold))
       ])),
     );
   }

@@ -13,9 +13,8 @@ class BasketPage extends StatefulWidget {
   @override
   State<BasketPage> createState() => _BasketPageState();
 }
-  
-class _BasketPageState extends State<BasketPage> {
 
+class _BasketPageState extends State<BasketPage> {
   @override
   Widget build(BuildContext context) {
     BasketManager basketManager = BasketManager();
@@ -27,7 +26,11 @@ class _BasketPageState extends State<BasketPage> {
           backgroundColor: Colors.white,
           leading: IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ControlPage()),
+                    (route) => false);
               },
               icon: const Icon(
                 Icons.arrow_back,
@@ -59,46 +62,43 @@ class _BasketPageState extends State<BasketPage> {
                       if (snapshot.hasData) {
                         if (snapshot.data!.docs.isEmpty) {
                           isNullBasket = false;
-                          return Align(
-                            alignment: Alignment.center,
-                            child: Center(
-                                child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Ürün Bulunamadı...",
-                                  style: Theme.of(context).textTheme.headline4,
-                                ),
-                                SizedBox(
-                                  height: 50.0.h,
-                                  width: 150.0.w,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ControlPage()));
-                                    },
-                                    child: Text(
-                                      "Alışverişe Dön",
-                                      style:
-                                          Theme.of(context).textTheme.headline5,
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                        primary:
-                                            Theme.of(context).primaryColor),
+                          return Center(
+                              child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Ürün Bulunamadı...",
+                                style: Theme.of(context).textTheme.headline4,
+                              ),
+                              SizedBox(
+                                height: 50.0.h,
+                                width: 150.0.w,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ControlPage()));
+                                  },
+                                  child: Text(
+                                    "Alışverişe Dön",
+                                    style:
+                                        Theme.of(context).textTheme.headline5,
                                   ),
-                                )
-                              ],
-                            )),
-                          );
+                                  style: ElevatedButton.styleFrom(
+                                      primary:
+                                          Theme.of(context).primaryColor),
+                                ),
+                              )
+                            ],
+                          ));
                         } else {
                           return ListView.builder(
                             shrinkWrap: true,
                             itemCount: snapshot.data!.docs.length,
                             scrollDirection: Axis.vertical,
-                            itemBuilder: (BuildContext context, int index) {                           
+                            itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () {},
                                 child: Container(
@@ -174,10 +174,15 @@ class _BasketPageState extends State<BasketPage> {
                                                 children: [
                                                   IconButton(
                                                       onPressed: () {
-                                                        if (snapshot.data!.docs[index]["productcount"] > 1) {
-                                                          
-                                                            snapshot.data!.docs[index]["productcount"]-1;
-                                                          
+                                                        if (snapshot.data!
+                                                                    .docs[index]
+                                                                [
+                                                                "productcount"] >
+                                                            1) {
+                                                          snapshot.data!.docs[
+                                                                      index][
+                                                                  "productcount"] -
+                                                              1;
                                                         }
                                                       },
                                                       icon: FaIcon(
@@ -194,9 +199,7 @@ class _BasketPageState extends State<BasketPage> {
                                                   ),
                                                   SizedBox(
                                                     child: IconButton(
-                                                        onPressed: () {
-                                                        
-                                                        },
+                                                        onPressed: () {},
                                                         icon: FaIcon(
                                                           FontAwesomeIcons
                                                               .plusCircle,
@@ -244,14 +247,13 @@ class _BasketPageState extends State<BasketPage> {
                       }
                   }
                 }),
-            isNullBasket
-                ? StreamBuilder(
+             StreamBuilder(
                     stream: basketManager.getAllBasketProduct(),
                     builder: (BuildContext context,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.hasData) {
                         for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                        //  totalPrice = value[i] * snapshot.data!.docs[i]["productprice"];
+                          //  totalPrice = value[i] * snapshot.data!.docs[i]["productprice"];
                         }
                         debugPrint("Toplam para : $totalPrice");
                       }
@@ -282,7 +284,7 @@ class _BasketPageState extends State<BasketPage> {
                       );
                     },
                   )
-                : Container()
+                
           ],
         ));
   }

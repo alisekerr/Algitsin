@@ -2,6 +2,7 @@ import 'package:algitsin/constants/theme_data.dart';
 import 'package:algitsin/core/extensions/size_config.dart';
 import 'package:algitsin/feature/service/auth/google_signin_provider.dart';
 import 'package:algitsin/feature/view/login_page.dart';
+import 'package:algitsin/feature/view/splash_page.dart';
 import 'package:algitsin/product/manager/basket_manager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -44,12 +45,12 @@ Future<void> main() async {
           ChangeNotifierProvider<GoogleSigninProvider>(
               create: (_) => GoogleSigninProvider()),
         ],
-        child:  NotificationListener<OverscrollIndicatorNotification>(
-          onNotification: (overScroll){
-            overScroll.disallowIndicator();
-            return true;
-          },
-          child: MyApp()),
+        child: NotificationListener<OverscrollIndicatorNotification>(
+            onNotification: (overScroll) {
+              overScroll.disallowIndicator();
+              return true;
+            },
+            child: MyApp()),
       )));
 }
 
@@ -59,9 +60,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SizeConfig(context).init();
-    return MaterialApp(
-        theme: algitsinThemeData,
+    return  const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: SellerLogin());
+        home: SplashPage());
   }
 }

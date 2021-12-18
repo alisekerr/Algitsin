@@ -2,13 +2,12 @@ import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/service/auth/auth_service.dart';
 import 'package:algitsin/feature/service/auth/google_signin_provider.dart';
 import 'package:algitsin/feature/view/control_page.dart';
-import 'package:algitsin/feature/view/home_page.dart';
-import 'package:algitsin/feature/view/loggedin_widget.dart';
+import 'package:algitsin/feature/view/loading_page.dart';
 import 'package:algitsin/feature/view/register_bottom_sheet.dart';
 import 'package:algitsin/feature/viewmodel/switch_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -32,6 +31,7 @@ class _SellerLoginState extends State<SellerLogin> {
   AuthService authService = AuthService();
   String userEmail = "";
   bool isVisibility = true;
+  bool _loadingVisible = false;
 
   @override
   void initState() {
@@ -39,70 +39,84 @@ class _SellerLoginState extends State<SellerLogin> {
     emailController.addListener(() => setState(() {}));
   }
 
+  Future<void> _changeLoadingVisible() async {
+    setState(() {
+      _loadingVisible = !_loadingVisible;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).textTheme;
     return Scaffold(
-      body: Align(
-        alignment: Alignment.center,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset("assets/welcome-icon.png"),
-              Text(
-                "Algitsin'e hoşgeldin",
-                style: theme.caption,
-              ),
-              Text(
-                "Devam Etmek İçin Giriş Yapınız",
-                style: theme.subtitle2,
-              ),
-              buildPadding8(),
-              buildEmailTextField(),
-              buildPadding8(),
-              buildPasswordTextField(),
-              buildPadding8(),
-              buildSignInButton(context, emailController, passwordController),
-              buildPadding8(),
-              SizedBox(
-                width: 343.0.w,
-                height: 57.0.h,
-                child: ElevatedButton(
-                  onPressed: () {
-                    userId = user!.uid;
-                    if (userId == "") {
-                      googleSignin.creatPerson(
-                          user!.displayName!, user!.email!);
-                    }
-
-                    final provider = Provider.of<GoogleSigninProvider>(context,
-                        listen: false);
-                    provider.googleLogin().then((value) =>
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ControlPage())));
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const FaIcon(FontAwesomeIcons.google),
-                      SizedBox(width: 10.0.w),
-                      Text(
-                        "Google Giriş Yap",
-                        style: theme.button!.copyWith(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor),
+      body: LoadingPage(
+        inAsyncCall: _loadingVisible,
+        child: Align(
+          alignment: Alignment.center,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset("assets/welcome-icon.png"),
+                Text(
+                  "Algitsin'e hoşgeldin",
+                  style: theme.caption,
                 ),
-              ),
-              buildPadding8(),
-              buildSellerSwitch(context, theme),
-              const RegisterBottomSheet()
-            ],
+                Text(
+                  "Devam Etmek İçin Giriş Yapınız",
+                  style: theme.subtitle2,
+                ),
+                buildPadding8(),
+                buildEmailTextField(),
+                buildPadding8(),
+                buildPasswordTextField(),
+                buildPadding8(),
+                buildSignInButton(context, emailController, passwordController),
+                buildPadding8(),
+                SizedBox(
+                  width: 343.0.w,
+                  height: 57.0.h,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      SystemChannels.textInput.invokeMethod('TextInput.hide');
+                      await _changeLoadingVisible();
+                      userId = user!.uid;
+                      if (userId == "") {
+                        googleSignin.creatPerson(
+                            user!.displayName!, user!.email!);
+                      }
+
+                      final provider = Provider.of<GoogleSigninProvider>(
+                          context,
+                          listen: false);
+
+                      provider.googleLogin().then((value) =>
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const ControlPage()),
+                              (route) => false));
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const FaIcon(FontAwesomeIcons.google),
+                        SizedBox(width: 10.0.w),
+                        Text(
+                          "Google Giriş Yap",
+                          style: theme.button!.copyWith(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                        primary: Theme.of(context).primaryColor),
+                  ),
+                ),
+                buildPadding8(),
+                buildSellerSwitch(context, theme),
+                const RegisterBottomSheet()
+              ],
+            ),
           ),
         ),
       ),
@@ -140,12 +154,14 @@ class _SellerLoginState extends State<SellerLogin> {
       height: 57.0.h,
       child: ElevatedButton(
         onPressed: () async {
+          SystemChannels.textInput.invokeMethod('TextInput.hide');
+           await _changeLoadingVisible();
           await authService
               .signIn(emailController.text, passwordController.text)
-              .then((value) => Navigator.push(
+              .then((value) => Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const ControlPage())));
+                  MaterialPageRoute(builder: (context) => const ControlPage()),
+                  (route) => false));
         },
         child: Text(
           "Giriş Yap",

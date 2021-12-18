@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/service/firestore/firestore_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:like_button/like_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -21,9 +22,11 @@ class ProductDetailPage extends StatefulWidget {
   _ProductDetailPageState createState() => _ProductDetailPageState();
 }
 
+String _groupValue = "";
+
 class _ProductDetailPageState extends State<ProductDetailPage> {
   FirestoreService firestoreService = FirestoreService();
-  String _groupValue = "";
+
   GoogleSigninProvider basketShop = GoogleSigninProvider();
   @override
   Widget build(BuildContext context) {
@@ -232,16 +235,30 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   width: 150.0.w,
                                   child: ElevatedButton(
                                     onPressed: () async {
-                                      await basketShop.basketShop(
-                                        
-                                          widget.selectedDoc["productname"],
-                                          widget.selectedDoc["productbrand"],
-                                          widget.selectedDoc["productimage"],
-                                          widget.selectedDoc["productprice"]).then((value) =>
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>   BasketPage())));
+                                      if (_groupValue == "") {
+                                        Fluttertoast.showToast(
+                                          msg:
+                                              "Lütfen Gerekli Seçimleri Yapınız",
+                                          fontSize: 18.0.spByWidth,
+                                        );
+                                      } else {
+                                        await basketShop
+                                            .basketShop(
+                                                widget
+                                                    .selectedDoc["productname"],
+                                                widget.selectedDoc[
+                                                    "productbrand"],
+                                                widget.selectedDoc[
+                                                    "productimage"],
+                                                widget.selectedDoc[
+                                                    "productprice"])
+                                            .then((value) =>
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const BasketPage())));
+                                      }
                                     },
                                     child: Text(
                                       "Sepete Ekle",
