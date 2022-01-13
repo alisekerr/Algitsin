@@ -18,37 +18,48 @@ class AuthService extends IAuthService {
   @override
   signOut() async {
     await auth.signOut();
-    return [];
   }
 
   @override
-  Future<User?> creatPerson(String name, String email, String password) async {
+  Future<User?> creatPerson(
+      String name, String email, String password, bool isSeller) async {
     var user = await auth.createUserWithEmailAndPassword(
         email: email, password: password);
 
     await firestore
         .collection("Person")
         .doc(user.user!.uid)
-        .set({"username": name, "email": email});
+        .set({"username": name, "email": email, "isseller": isSeller});
 
     return user.user;
   }
-  /*basketShop(
-    String name,
-    String brand,
-    String imageUrl,
-    int price,
-  ) async {
+
+  creatNewProduct(String name, String brand, String description, List imageUrl,
+      String price, bool discount, String category) async {
     await firestore
         .collection("Person")
-        .doc(user.user!.uid)
-        .collection("Product")
+        .doc(auth.currentUser!.uid)
+        .collection("SellerProduct")
         .doc(name)
         .set({
       "productname": name,
       "productbrand": brand,
+      "productdescription": description,
       "productprice": price,
       "productimage": imageUrl,
+      "productdiscount": discount,
+      "productcategory": category
     });
-  }*/
+    await firestore.collection("ProductGlobal").doc(name).set({
+      "productname": name,
+      "productbrand": brand,
+      "productdescription": description,
+      "productprice": price,
+      "productimage": imageUrl,
+      "productdiscount": discount,
+      "productcategory": category
+    });
+  }
+
+  
 }

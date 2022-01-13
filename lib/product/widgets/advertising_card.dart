@@ -1,6 +1,7 @@
 import 'package:algitsin/core/exception/product_not_found.dart';
 import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/service/firestore/firestore_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +11,6 @@ class AdvertisingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FirestoreService firestoreService = FirestoreService();
-
     return SizedBox(
         height: 200.0.h,
         width: MediaQuery.of(context).size.width,
@@ -29,13 +29,13 @@ class AdvertisingCard extends StatelessWidget {
                       return const Center(child: Text("Ürün Bulunamadı..."));
                     } else {
                       return ListView.builder(
-                         physics: const BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: snapshot.data!.docs.length,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (BuildContext context, int index) {
-                          return InkWell(
-                            onTap: () async {},
+                          return GestureDetector(
+                            onTap: () {},
                             child: Container(
                               width: 300.0.w,
                               margin: EdgeInsets.only(
@@ -64,10 +64,10 @@ class AdvertisingCard extends StatelessWidget {
                                           child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(15.0.h),
-                                              child: Image.network(
-                                                snapshot.data!.docs[index]
-                                                    ["productimage"],
-                                                fit: BoxFit.cover,
+                                              child: CachedNetworkImage(
+                                                 imageUrl: snapshot.data!.docs[index]
+                                                    ["productimage"][0],fit: BoxFit.cover,
+                                               
                                               )),
                                         ),
                                         Positioned(
@@ -108,9 +108,10 @@ class AdvertisingCard extends StatelessWidget {
                         },
                       );
                     }
-                  } else{ return const Center(child: Text("Hata..."));}
+                  } else {
+                    return const Center(child: Text("Hata..."));
+                  }
               }
             }));
   }
 }
-

@@ -1,9 +1,11 @@
 import 'package:algitsin/core/exception/product_not_found.dart';
 import 'package:algitsin/core/extensions/size_extention.dart';
+import 'package:algitsin/feature/service/firestore/product_sevice.dart';
 import 'package:algitsin/feature/view/control_page.dart';
 import 'package:algitsin/product/manager/basket_manager.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:count_stepper/count_stepper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -14,11 +16,40 @@ class BasketPage extends StatefulWidget {
   State<BasketPage> createState() => _BasketPageState();
 }
 
+double totalPrice = 0;
+
 class _BasketPageState extends State<BasketPage> {
+  Future<double> fiyatGetir() async {
+    double toplam = 0;
+    final user = FirebaseAuth.instance.currentUser!;
+    QuerySnapshot veri = await FirebaseFirestore.instance
+        .collection("Person")
+        .doc(user.uid)
+        .collection("Product")
+        .get();
+
+    for (var i = 0; i < veri.docs.length; i++) {
+      toplam += double.parse(veri.docs[i]["productprice"]) *
+          veri.docs[i]["productcount"];
+    }
+    return toplam;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    fiyatGetir().then((value) {
+      totalPrice = value;
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     BasketManager basketManager = BasketManager();
-    num totalPrice = 0;
+    ProductService _productService = ProductService();
+
     bool isNullBasket = true;
 
     return Scaffold(
@@ -87,8 +118,7 @@ class _BasketPageState extends State<BasketPage> {
                                         Theme.of(context).textTheme.headline5,
                                   ),
                                   style: ElevatedButton.styleFrom(
-                                      primary:
-                                          Theme.of(context).primaryColor),
+                                      primary: Theme.of(context).primaryColor),
                                 ),
                               )
                             ],
@@ -135,10 +165,20 @@ class _BasketPageState extends State<BasketPage> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           15.0.h),
-                                                  child: Image.network(
-                                                      snapshot.data!.docs[index]
-                                                          ["productimage"],
-                                                      fit: BoxFit.cover)),
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: snapshot
+                                                            .data!.docs[index]
+                                                        ["productimage"],
+                                                    fit: BoxFit.cover,
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        Image.asset(
+                                                            "assets/basketicon.jpg"),
+                                                    errorWidget: (context, url,
+                                                            error) =>
+                                                        Image.asset(
+                                                            "assets/erroricon.jpg"),
+                                                  )),
                                             ),
                                           ),
                                           Column(
@@ -156,20 +196,6 @@ class _BasketPageState extends State<BasketPage> {
                                                     fontWeight:
                                                         FontWeight.w800),
                                               ),
-                                              /* CountStepper(
-                                                iconColor: Theme.of(context)
-                                                    .primaryColor,
-                                                defaultValue: 1,
-                                                max: 10,
-                                                min: 1,
-                                                iconDecrementColor:
-                                                    Theme.of(context).cardColor,
-                                                splashRadius: 12,
-                                                onPressed: (value) {
-                                                  valuee = value;
-                                                  debugPrint(valuee.toString());
-                                                },
-                                              ),*/
                                               Row(
                                                 children: [
                                                   IconButton(
@@ -177,12 +203,59 @@ class _BasketPageState extends State<BasketPage> {
                                                         if (snapshot.data!
                                                                     .docs[index]
                                                                 [
+                                                                "productcount"] ==
+                                                            1) {
+                                                          setState(() {
+                                                            _productService
+                                                                .deleteProduct(snapshot
+                                                                        .data!
+                                                                        .docs[index]
+                                                                    [
+                                                                    "productname"]);
+                                                            totalPrice -= double
+                                                                .parse(snapshot
+                                                                        .data!
+                                                                        .docs[index]
+                                                                    [
+                                                                    "productprice"]);
+                                                          });
+                                                        }
+                                                        if (snapshot.data!
+                                                                    .docs[index]
+                                                                [
                                                                 "productcount"] >
                                                             1) {
-                                                          snapshot.data!.docs[
-                                                                      index][
-                                                                  "productcount"] -
-                                                              1;
+                                                          final user =
+                                                              FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser!;
+                                                          FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  "Person")
+                                                              .doc(user.uid)
+                                                              .collection(
+                                                                  "Product")
+                                                              .doc(snapshot
+                                                                  .data!
+                                                                  .docs[index]
+                                                                  .id)
+                                                              .update({
+                                                            "productcount": snapshot
+                                                                        .data!
+                                                                        .docs[index]
+                                                                    [
+                                                                    "productcount"] -
+                                                                1
+                                                          });
+                                                          setState(() {
+                                                            totalPrice -= double
+                                                                .parse(snapshot
+                                                                        .data!
+                                                                        .docs[index]
+                                                                    [
+                                                                    "productprice"]);
+                                                          });
                                                         }
                                                       },
                                                       icon: FaIcon(
@@ -193,13 +266,49 @@ class _BasketPageState extends State<BasketPage> {
                                                         size: 20,
                                                       )),
                                                   Text(
-                                                    "value[index].toString()",
+                                                    snapshot
+                                                        .data!
+                                                        .docs[index]
+                                                            ["productcount"]
+                                                        .toString(),
                                                     style: const TextStyle(
                                                         fontSize: 14),
                                                   ),
                                                   SizedBox(
                                                     child: IconButton(
-                                                        onPressed: () {},
+                                                        onPressed: () {
+                                                          final user =
+                                                              FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser!;
+                                                          FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  "Person")
+                                                              .doc(user.uid)
+                                                              .collection(
+                                                                  "Product")
+                                                              .doc(snapshot
+                                                                  .data!
+                                                                  .docs[index]
+                                                                  .id)
+                                                              .update({
+                                                            "productcount": snapshot
+                                                                        .data!
+                                                                        .docs[index]
+                                                                    [
+                                                                    "productcount"] +
+                                                                1
+                                                          });
+                                                          setState(() {
+                                                            totalPrice += double
+                                                                .parse(snapshot
+                                                                        .data!
+                                                                        .docs[index]
+                                                                    [
+                                                                    "productprice"]);
+                                                          });
+                                                        },
                                                         icon: FaIcon(
                                                           FontAwesomeIcons
                                                               .plusCircle,
@@ -221,7 +330,7 @@ class _BasketPageState extends State<BasketPage> {
                                         style: TextStyle(
                                           color: Theme.of(context)
                                               .selectedRowColor,
-                                          fontSize: 12.0.spByWidth,
+                                          fontSize: 15.0.spByWidth,
                                         ),
                                       ),
                                       Text(
@@ -229,7 +338,7 @@ class _BasketPageState extends State<BasketPage> {
                                             ["productbrand"],
                                         style: TextStyle(
                                           color: Theme.of(context).primaryColor,
-                                          fontSize: 14.0.spByWidth,
+                                          fontSize: 12.0.spByWidth,
                                         ),
                                       ),
                                       SizedBox(
@@ -247,44 +356,31 @@ class _BasketPageState extends State<BasketPage> {
                       }
                   }
                 }),
-             StreamBuilder(
-                    stream: basketManager.getAllBasketProduct(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasData) {
-                        for (var i = 0; i < snapshot.data!.docs.length; i++) {
-                          //  totalPrice = value[i] * snapshot.data!.docs[i]["productprice"];
-                        }
-                        debugPrint("Toplam para : $totalPrice");
-                      }
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            "Toplam Fiyat : $totalPrice\$",
-                            style: Theme.of(context).textTheme.headline4,
-                          ),
-                          SizedBox(
-                            height: 50.0.h,
-                            width: 150.0.w,
-                            child: Padding(
-                              padding: EdgeInsets.all(3.0.spByWidth),
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                child: Text(
-                                  "Sepeti Onayla",
-                                  style: Theme.of(context).textTheme.headline5,
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                    primary: Theme.of(context).primaryColor),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  )
-                
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  "Toplam Fiyat : " + totalPrice.toString() + "\$",
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+                SizedBox(
+                  height: 50.0.h,
+                  width: 150.0.w,
+                  child: Padding(
+                    padding: EdgeInsets.all(3.0.spByWidth),
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text(
+                        "Sepeti Onayla",
+                        style: Theme.of(context).textTheme.headline5,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                          primary: Theme.of(context).primaryColor),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ));
   }

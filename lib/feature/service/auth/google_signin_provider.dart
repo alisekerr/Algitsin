@@ -9,14 +9,21 @@ class GoogleSigninProvider extends ChangeNotifier {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final userGoogle = FirebaseAuth.instance.currentUser;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
+  bool deneme = true;
   GoogleSignInAccount? _user;
   GoogleSignInAccount get user => _user!;
   Future googleLogin() async {
-    final googleUser = await googleSignin.signIn();
-    if (googleUser == null) {
-      return _user = googleUser;
+    GoogleSignInAccount? googleUser;
+    try {
+      googleUser = await googleSignin.signIn().catchError((e) => e.toString());
+    } catch (e) {
+      print("9 error " + e.toString());
     }
+
+    if (googleUser == null) {
+      return deneme;
+    }
+
     final googleAuth = await googleUser.authentication;
 
     final credential = GoogleAuthProvider.credential(
@@ -29,26 +36,12 @@ class GoogleSigninProvider extends ChangeNotifier {
     FirebaseAuth.instance.signOut();
   }
 
-  Future creatPerson(String name, String email) async {
+  Future creatPerson(String name, String email, bool isSeller) async {
     await firestore
         .collection("Person")
         .doc(userGoogle!.uid)
-        .set({"username": name, "email": email});
+        .set({"username": name, "email": email, "isseller": isSeller});
   }
 
-  Future basketShop(
-      String name, String brand, String imageUrl, int price) async {
-    await firestore
-        .collection("Person")
-        .doc(userGoogle!.uid)
-        .collection("Product")
-        .doc(name)
-        .set({
-      "Productcount": 1,
-      "productname": name,
-      "productbrand": brand,
-      "productprice": price,
-      "productimage": imageUrl,
-    });
-  }
+  
 }

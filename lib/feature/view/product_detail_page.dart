@@ -1,51 +1,72 @@
-import 'package:algitsin/constants/product_key.dart';
-import 'package:algitsin/feature/service/auth/google_signin_provider.dart';
-import 'package:algitsin/feature/view/basket_page.dart';
+import 'package:algitsin/feature/service/firestore/product_sevice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import 'package:algitsin/core/extensions/size_extention.dart';
-import 'package:algitsin/feature/service/firestore/firestore_service.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:like_button/like_button.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:algitsin/core/extensions/size_extention.dart';
+import 'package:algitsin/feature/service/auth/google_signin_provider.dart';
+import 'package:algitsin/feature/service/firestore/firestore_service.dart';
+import 'package:algitsin/feature/view/basket_page.dart';
 
 // ignore: must_be_immutable
 class ProductDetailPage extends StatefulWidget {
-  QueryDocumentSnapshot<Object?> selectedDoc;
-
+  List<QueryDocumentSnapshot<Object?>> selectedDoc;
+  int productIndex;
   ProductDetailPage({
     Key? key,
     required this.selectedDoc,
+    required this.productIndex,
   }) : super(key: key);
   @override
   _ProductDetailPageState createState() => _ProductDetailPageState();
 }
 
+var productImageLength;
 String _groupValue = "";
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   FirestoreService firestoreService = FirestoreService();
 
-  GoogleSigninProvider basketShop = GoogleSigninProvider();
+  ProductService _productService = ProductService();
   @override
   Widget build(BuildContext context) {
+    productImageLength =
+        widget.selectedDoc[widget.productIndex]["productimage"].length;
     return Scaffold(
         body: StreamBuilder(
-            stream: firestoreService.getClothesProductData(),
+            stream: firestoreService.getAllProductData(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               return SlidingUpPanel(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(30.0.spByWidth)),
                 maxHeight: 600,
                 minHeight: 400,
                 body: Stack(children: [
                   SizedBox(
                     width: double.maxFinite,
                     height: 350.0.h,
-                    child: Image.network(
-                      widget.selectedDoc["productimage"],
-                      fit: BoxFit.cover,
+                    child: PhotoViewGallery.builder(
+                      customSize: Size(
+                        double.maxFinite,
+                        350.0.h,
+                      ),
+                      itemCount: productImageLength,
+                      builder: (context, index) {
+                        return PhotoViewGalleryPageOptions(
+                          filterQuality: FilterQuality.high,
+                          imageProvider: NetworkImage(
+                              widget.selectedDoc[widget.productIndex]
+                                  ["productimage"][index]),
+                          maxScale: PhotoViewComputedScale.contained * 2,
+                          minScale: PhotoViewComputedScale.contained * 0.8,
+                        );
+                      },
+                      scrollPhysics: const BouncingScrollPhysics(),
+                      backgroundDecoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor),
                     ),
                   ),
                   Positioned(
@@ -79,15 +100,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  widget.selectedDoc["productname"],
+                                  widget.selectedDoc[widget.productIndex]
+                                      ["productname"],
                                   style: Theme.of(context)
                                       .textTheme
                                       .headline1!
-                                      .copyWith(color: Colors.black87),
+                                      .copyWith(
+                                        color: Colors.black87,
+                                      ),
                                 ),
                                 Text(
                                     "\$" +
-                                        widget.selectedDoc["productprice"]
+                                        widget.selectedDoc[widget.productIndex]
+                                                ["productprice"]
                                             .toString(),
                                     style: Theme.of(context)
                                         .textTheme
@@ -98,93 +123,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                             fontWeight: FontWeight.normal)),
                               ],
                             ),
-                            /*Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      LikeButton(size: 30.0.spByWidth,),
-                                    ],
-                                  ),*/
                             SizedBox(height: 20.0.h),
-                            ProductKey.clothes ==
-                                    widget
-                                        .selectedDoc.reference.parent.parent!.id
-                                ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Renk Seçenekleri",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline4),
-                                      Row(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Radio(
-                                                  activeColor: Theme.of(context)
-                                                      .primaryColor,
-                                                  value:
-                                                      "${widget.selectedDoc["productcolor"][0]}",
-                                                  groupValue: _groupValue,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _groupValue =
-                                                          value as String;
-                                                    });
-                                                  }),
-                                              Text(widget.selectedDoc[
-                                                  "productcolor"][0])
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Radio(
-                                                  activeColor: Theme.of(context)
-                                                      .primaryColor,
-                                                  value:
-                                                      "${widget.selectedDoc["productcolor"][1]}",
-                                                  groupValue: _groupValue,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _groupValue =
-                                                          value as String;
-                                                    });
-                                                  }),
-                                              Text(widget.selectedDoc[
-                                                  "productcolor"][1])
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Radio(
-                                                  activeColor: Theme.of(context)
-                                                      .primaryColor,
-                                                  value:
-                                                      "${widget.selectedDoc["productcolor"][2]}",
-                                                  groupValue: _groupValue,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _groupValue =
-                                                          value as String;
-                                                    });
-                                                  }),
-                                              Text(widget.selectedDoc[
-                                                  "productcolor"][2])
-                                            ],
-                                          )
-                                        ],
-                                      )
-                                    ],
-                                  )
-                                : Container(
-                                    width: 0,
-                                  ),
                             Text("Ürün Açıklaması",
                                 style: Theme.of(context).textTheme.headline4),
                             SizedBox(
                               height: 10.0.h,
                             ),
-                            Text(widget.selectedDoc["productdescription"],
+                            Text(
+                                widget.selectedDoc[widget.productIndex]
+                                    ["productdescription"],
                                 style: Theme.of(context).textTheme.headline3),
                             SizedBox(
                               height: 10.0.h,
@@ -235,30 +182,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                   width: 150.0.w,
                                   child: ElevatedButton(
                                     onPressed: () async {
-                                      if (_groupValue == "") {
-                                        Fluttertoast.showToast(
-                                          msg:
-                                              "Lütfen Gerekli Seçimleri Yapınız",
-                                          fontSize: 18.0.spByWidth,
-                                        );
-                                      } else {
-                                        await basketShop
-                                            .basketShop(
-                                                widget
-                                                    .selectedDoc["productname"],
-                                                widget.selectedDoc[
-                                                    "productbrand"],
-                                                widget.selectedDoc[
-                                                    "productimage"],
-                                                widget.selectedDoc[
-                                                    "productprice"])
-                                            .then((value) =>
-                                                Navigator.pushReplacement(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const BasketPage())));
-                                      }
+                                      await _productService
+                                          .basketShop(
+                                              widget.selectedDoc[widget.productIndex]
+                                                  ["productname"],
+                                              widget.selectedDoc[widget.productIndex]
+                                                  ["productbrand"],
+                                              widget.selectedDoc[widget.productIndex]
+                                                  ["productimage"][0],
+                                              widget
+                                                  .selectedDoc[widget.productIndex]
+                                                      ["productprice"]
+                                                  .toString(),
+                                              1)
+                                          .then((value) =>
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const BasketPage())));
+                                      //  }
                                     },
                                     child: Text(
                                       "Sepete Ekle",

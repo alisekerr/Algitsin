@@ -1,11 +1,11 @@
 import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/view/basket_page.dart';
-import 'package:algitsin/feature/view/category_page.dart';
 import 'package:algitsin/feature/view/home_page.dart';
 import 'package:algitsin/feature/view/loading_page.dart';
 import 'package:algitsin/feature/view/search_page.dart';
 import 'package:algitsin/feature/view/user_page.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -22,7 +22,7 @@ class _ControlPageState extends State<ControlPage> {
   int _selectedPage = 0;
 
   List<Widget> pages = [
-    const HomePage(),
+    HomePage(),
     const SearchPage(),
     const BasketPage(),
     const UserPage()
@@ -49,13 +49,6 @@ class _ControlPageState extends State<ControlPage> {
     super.initState();
   }
 
-  Future delayMake() async {
-    await Future.delayed(const Duration(seconds: 3));
-    setState(() {
-      _loadingVisible = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,17 +56,9 @@ class _ControlPageState extends State<ControlPage> {
         inAsyncCall: _loadingVisible,
         child: PageView(
           onPageChanged: (index) async {
-            if (index !=0 && index !=1 && index!=3) {
-              SystemChannels.textInput.invokeMethod('TextInput.hide');
-            await _changeLoadingVisible();
-            }
-            
             setState(() {
               _selectedPage = index;
             });
-          
-              delayMake();
-            
           },
           controller: _pageController,
           children: [...pages],

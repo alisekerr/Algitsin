@@ -1,35 +1,39 @@
+import 'dart:math';
+
 import 'package:algitsin/core/extensions/size_extention.dart';
 import 'package:algitsin/feature/service/auth/auth_service.dart';
 import 'package:algitsin/feature/service/auth/google_signin_provider.dart';
 import 'package:algitsin/feature/view/control_page.dart';
+import 'package:algitsin/feature/view/google_landing.dart';
+import 'package:algitsin/feature/view/landing_page.dart';
 import 'package:algitsin/feature/view/loading_page.dart';
-import 'package:algitsin/feature/view/register_bottom_sheet.dart';
-import 'package:algitsin/feature/viewmodel/switch_state.dart';
+import 'package:algitsin/feature/view/register_page.dart';
+import 'package:algitsin/product/widgets/base_button.dart';
+import 'package:algitsin/product/widgets/switch_state.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
-class SellerLogin extends StatefulWidget {
-  const SellerLogin({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  _SellerLoginState createState() => _SellerLoginState();
+  _LoginPageState createState() => _LoginPageState();
 }
-
+bool _isVisibility=false;
 var switchState = SwitchState(title: "Create seller account", value: false);
+final FirebaseFirestore firestore = FirebaseFirestore.instance;
+final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-class _SellerLoginState extends State<SellerLogin> {
+class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
-  String userId = "";
-  var user = FirebaseAuth.instance.currentUser;
+  User? user = FirebaseAuth.instance.currentUser;
   GoogleSigninProvider googleSignin = GoogleSigninProvider();
-
   AuthService authService = AuthService();
-  String userEmail = "";
   bool isVisibility = true;
   bool _loadingVisible = false;
 
@@ -48,6 +52,42 @@ class _SellerLoginState extends State<SellerLogin> {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).textTheme;
+    buttonGoogleSignIn() async {
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+      await _changeLoadingVisible();
+
+      final provider =
+          Provider.of<GoogleSigninProvider>(context, listen: false);
+      await provider.googleLogin().then((value) {
+        if (value == true) {
+          setState(() async {
+            await _changeLoadingVisible();
+          });
+        } else {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const GoogleLanding()),
+              (route) => false);
+        }
+      });
+    }
+
+    buttonSignIn() async {
+      try {
+        await authService
+            .signIn(emailController.text, passwordController.text)
+            .then((value) => Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LandingPage()),
+                (route) => false));
+      } catch (e) {
+       setState(() {
+         _isVisibility=true;
+       });
+      
+      }
+    }
+
     return Scaffold(
       body: LoadingPage(
         inAsyncCall: _loadingVisible,
@@ -71,50 +111,24 @@ class _SellerLoginState extends State<SellerLogin> {
                 buildPadding8(),
                 buildPasswordTextField(),
                 buildPadding8(),
-                buildSignInButton(context, emailController, passwordController),
+                BaseButton(
+                    function: buttonSignIn,
+                    icon: const FaIcon(FontAwesomeIcons.signInAlt),
+                    text: "Giriş Yap"),
                 buildPadding8(),
-                SizedBox(
-                  width: 343.0.w,
-                  height: 57.0.h,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      SystemChannels.textInput.invokeMethod('TextInput.hide');
-                      await _changeLoadingVisible();
-                      userId = user!.uid;
-                      if (userId == "") {
-                        googleSignin.creatPerson(
-                            user!.displayName!, user!.email!);
-                      }
-
-                      final provider = Provider.of<GoogleSigninProvider>(
-                          context,
-                          listen: false);
-
-                      provider.googleLogin().then((value) =>
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const ControlPage()),
-                              (route) => false));
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const FaIcon(FontAwesomeIcons.google),
-                        SizedBox(width: 10.0.w),
-                        Text(
-                          "Google Giriş Yap",
-                          style: theme.button!.copyWith(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                    style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor),
-                  ),
-                ),
+                BaseButton(
+                    function: buttonGoogleSignIn,
+                    icon: const FaIcon(FontAwesomeIcons.google),
+                    text: "Google İle Giriş Yap"),
                 buildPadding8(),
-                buildSellerSwitch(context, theme),
-                const RegisterBottomSheet()
+                buildRegisterText(context, theme),
+                  Visibility(
+                   visible: _isVisibility,
+                   child: const Text(
+                    "Lütfen Gerekli Bilgileri Doğru Giriniz !",
+                    style: TextStyle(color: Colors.red),
+                                 ),
+                 )
               ],
             ),
           ),
@@ -123,53 +137,20 @@ class _SellerLoginState extends State<SellerLogin> {
     );
   }
 
-  Row buildSellerSwitch(BuildContext context, TextTheme theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          "Satıcı olarak kayıt ol",
-          style: theme.subtitle2,
-        ),
-        Switch.adaptive(
-            activeColor: Theme.of(context).primaryColor,
-            activeTrackColor: Theme.of(context).primaryColor.withOpacity(0.75),
-            value: switchState.value,
-            onChanged: (value) {
-              setState(() {
-                switchState.setBool(value);
-              });
-            }),
-      ],
-    );
-  }
-
-  SizedBox buildSignInButton(
-      BuildContext context,
-      TextEditingController emailController,
-      TextEditingController passwordController) {
-    var theme = Theme.of(context).textTheme;
-    return SizedBox(
-      width: 343.0.w,
-      height: 57.0.h,
-      child: ElevatedButton(
-        onPressed: () async {
-          SystemChannels.textInput.invokeMethod('TextInput.hide');
-           await _changeLoadingVisible();
-          await authService
-              .signIn(emailController.text, passwordController.text)
-              .then((value) => Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ControlPage()),
-                  (route) => false));
-        },
-        child: Text(
-          "Giriş Yap",
-          style: theme.button!.copyWith(color: Colors.white),
-        ),
-        style:
-            ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
-      ),
+  GestureDetector buildRegisterText(BuildContext context, TextTheme theme) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const RegisterPage()));
+      },
+      child: RichText(
+          text: TextSpan(children: [
+        TextSpan(text: "Bir heabın yok mu ? ", style: theme.subtitle2),
+        TextSpan(
+            text: "Kayıt ol",
+            style: theme.subtitle2!.copyWith(
+                color: const Color(0xff55f7b9), fontWeight: FontWeight.bold))
+      ])),
     );
   }
 
